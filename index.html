@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dost App 🤝</title>
+<meta name="theme-color" content="#6366f1">
+<link rel="manifest" href="manifest.json">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh;
+    color: #fff;
+    padding-bottom: 80px;
+  }
+  .header {
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    padding: 20px 16px;
+  }
+  .header h1 { font-size: 20px; font-weight: 700; }
+  .header p { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+  .input-box {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 15px;
+    resize: none;
+    font-family: inherit;
+  }
+  textarea::placeholder { color: rgba(255,255,255,0.4); }
+  .cats { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .cat-btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .cat-btn.active { font-weight: 700; }
+  .add-btn {
+    margin-left: auto;
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  input[type=text] {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 12px;
+    font-family: inherit;
+  }
+  input[type=text]::placeholder { color: rgba(255,255,255,0.4); }
+  .filters { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .filter-btn.active { background: rgba(99,102,241,0.7); font-weight: 700; }
+  .note-card {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border-left: 4px solid #6366f1;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .note-card.done { background: rgba(255,255,255,0.03); border-left-color: #555; opacity: 0.6; }
+  .check-btn {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: #fff;
+    font-size: 11px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .check-btn.checked { background: #10b981; border-color: #10b981; }
+  .note-text { font-size: 14px; line-height: 1.5; flex: 1; }
+  .note-text.done-text { text-decoration: line-through; }
+  .note-meta { font-size: 11px; opacity: 0.4; margin-top: 4px; }
+  .cat-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+  .action-btns { display: flex; gap: 4px; }
+  .icon-btn { background: none; border: none; font-size: 14px; cursor: pointer; padding: 4px; }
+  .empty { text-align: center; padding: 50px 20px; opacity: 0.5; }
+  .empty .emoji { font-size: 48px; margin-bottom: 12px; }
+  .footer-count { text-align: center; margin-top: 16px; opacity: 0.3; font-size: 12px; }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 8px 30px rgba(99,102,241,0.5);
+    z-index: 999;
+    white-space: nowrap;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🤝 Dost — Tera Memory Yaar</h1>
+  <p id="greeting"></p>
+  <div class="badge" id="pending-badge" style="display:none"></div>
+</div>
+
+<div class="container">
+  <div class="input-box">
+    <textarea id="noteInput" rows="2" placeholder="Kya yaad rakhna hai yaar? Likh do... 📝"></textarea>
+    <div class="cats">
+      <button class="cat-btn active" data-cat="kaam" style="background:#6366f1" onclick="selectCat(this,'kaam')">📋 Kaam</button>
+      <button class="cat-btn" data-cat="shopping" onclick="selectCat(this,'shopping')">🛒 Shopping</button>
+      <button class="cat-btn" data-cat="yaadein" onclick="selectCat(this,'yaadein')">💭 Yaadein</button>
+      <button class="cat-btn" data-cat="important" onclick="selectCat(this,'important')">⭐ Zaroori</button>
+      <button class="add-btn" onclick="addNote()">+ Yaad Rakho</button>
+    </div>
+  </div>
+
+  <input type="text" id="searchInput" placeholder="🔍 Kuch dhundo..." oninput="renderNotes()">
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all',this)">🗂️ Sab</button>
+    <button class="filter-btn" onclick="setFilter('kaam',this)">📋 Kaam</button>
+    <button class="filter-btn" onclick="setFilter('shopping',this)">🛒 Shopping</button>
+    <button class="filter-btn" onclick="setFilter('yaadein',this)">💭 Yaadein</button>
+    <button class="filter-btn" onclick="setFilter('important',this)">⭐ Zaroori</button>
+  </div>
+
+  <div id="notesList"></div>
+  <div class="footer-count" id="footerCount"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS = {
+  kaam: { label: '📋 Kaam', color: '#6366f1' },
+  shopping: { label: '🛒 Shopping', color: '#f59e0b' },
+  yaadein: { label: '💭 Yaadein', color: '#ec4899' },
+  important: { label: '⭐ Zaroori', color: '#10b981' },
+};
+const MSGS = [
+  'Kal mat bhoolna yaar! 😄',
+  'Note kar liya, ab tension nahi! ✅',
+  'Bhai, ye zaroori hai, dhyan rakhna! 🔥',
+  'Yaar tu sach mein bhool jaata hai! 😎',
+  'Teri yaaddasht ka dost hoon main! 🤝',
+];
+
+let notes = JSON.parse(localStorage.getItem('dost-notes') || '[]');
+let currentCat = 'kaam';
+let currentFilter = 'all';
+
+function save() { localStorage.setItem('dost-notes', JSON.stringify(notes)); }
+
+function selectCat(btn, cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = 'rgba(255,255,255,0.1)';
+  });
+  btn.classList.add('active');
+  btn.style.background = CATS[cat].color;
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNotes();
+}
+
+function addNote() {
+  const text = document.getElementById('noteInput').value.trim();
+  if (!text) return;
+  const now = new Date();
+  notes.unshift({
+    id: Date.now(),
+    text,
+    category: currentCat,
+    done: false,
+    time: now.toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' }),
+    date: now.toLocaleDateString('hi-IN'),
+  });
+  document.getElementById('noteInput').value = '';
+  save();
+  renderNotes();
+  showToast(MSGS[Math.floor(Math.random() * MSGS.length)]);
+}
+
+function toggleDone(id) {
+  notes = notes.map(n => n.id === id ? { ...n, done: !n.done } : n);
+  save(); renderNotes();
+}
+
+function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  save(); renderNotes();
+  showToast('Delete ho gaya yaar! 🗑️');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+function renderNotes() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = notes.filter(n => {
+    const matchCat = currentFilter === 'all' || n.category === currentFilter;
+    const matchSearch = n.text.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+
+  const list = document.getElementById('notesList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="emoji">🫥</div><p>Kuch nahi mila yaar!<br>Kuch likh ke toh dekho 😄</p></div>`;
+  } else {
+    list.innerHTML = filtered.map(n => {
+      const cat = CATS[n.category];
+      return `<div class="note-card ${n.done ? 'done' : ''}" style="border-left-color:${n.done ? '#555' : cat.color}">
+        <button class="check-btn ${n.done ? 'checked' : ''}" onclick="toggleDone(${n.id})">${n.done ? '✓' : ''}</button>
+        <div style="flex:1">
+          <div class="note-text ${n.done ? 'done-text' : ''}">${n.text}</div>
+          <div class="note-meta">${n.date} · ${n.time}
+            <span class="cat-tag" style="background:${cat.color}33;color:${cat.color}">${cat.label}</span>
+          </div>
+        </div>
+        <div class="action-btns">
+          <button class="icon-btn" onclick="deleteNote(${n.id})">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const pending = notes.filter(n => !n.done).length;
+  const badge = document.getElementById('pending-badge');
+  if (pending > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = `🔔 ${pending} cheez${pending > 1 ? 'ein' : ''} baaki hain!`;
+  } else {
+    badge.style.display = 'none';
+  }
+
+  const fc = document.getElementById('footerCount');
+  fc.textContent = notes.length > 0 ? `Total ${notes.length} cheezein — ${notes.filter(n => n.done).length} ho gayi ✅` : '';
+}
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const msg = h < 12 ? 'Subah ki chay le aao aur kaam shuru karo ☕' :
+              h < 17 ? 'Dopahar mein thak gaye? Notes check karo! 😄' :
+              'Shaam ho gayi, kya kuch chhoot gaya aaj? 🌙';
+  document.getElementById('greeting').textContent = msg;
+}
+
+// Enter key to add note
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('noteInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addNote(); }
+  });
+  setGreeting();
+  renderNotes();
+});
+</script>
+</body>
+</html>
